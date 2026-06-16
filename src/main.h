@@ -2,6 +2,7 @@
 #define MAIN_H
 
 #include <memory>
+#include <string>
 
 typedef struct GameConfig {
     int screen_width;
@@ -40,31 +41,38 @@ public:
 };
 
 class Screen {
+protected:
+    std::unique_ptr<Screen> next_screen_;
+    int frames_counter_;
+    int finish_screen_;
 public:
     virtual void UpdateScreen() = 0;
     virtual void DrawScreen() = 0;
     virtual int FinishScreen() = 0;
-    virtual std::unique_ptr<Screen> getNextScreen() = 0;
+    std::unique_ptr<Screen> getNextScreen();
 
-    virtual ~Screen() = default;
+    virtual ~Screen();
 };
 
 class ScreenLogo : public Screen {
 private:
-    std::unique_ptr<Screen> next_screen_;
-    int framesCounter;
-    int finishScreen;
-    int logoPositionX;
-    int logoPositionY;
-
+    int logo_position_x;
+    int logo_position_y;
 public:
     void UpdateScreen() override;
     void DrawScreen() override;
     int FinishScreen() override;
 
-    std::unique_ptr<Screen> getNextScreen() override;
-
     ScreenLogo();
+};
+
+class ScreenGameplay : public Screen {
+public:
+    void UpdateScreen() override;
+    void DrawScreen() override;
+    int FinishScreen() override;
+
+    ScreenGameplay();
 };
 
 #endif

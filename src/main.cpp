@@ -99,3 +99,9 @@ int Game::GetScreenHeight() {
 int Game::GetTargetFPS() {
     return config_.target_fps;
 }
+
+Screen::~Screen() = default;
+
+std::unique_ptr<Screen> Screen::getNextScreen() {
+    return std::move(next_screen_);
+}
