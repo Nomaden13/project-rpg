@@ -42,8 +42,8 @@ endef
 
 ifeq ($(config),debug_x64)
 TARGETDIR = bin/Debug
-TARGET = $(TARGETDIR)/project-rpg
-OBJDIR = obj/x64/Debug/project-rpg
+TARGET = $(TARGETDIR)/test-raylib
+OBJDIR = obj/x64/Debug/test-raylib
 DEFINES += -DDEBUG -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33 -D_GLFW_X11
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -Wshadow -g -std=c17
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -Wshadow -g -std=c++17
@@ -53,8 +53,8 @@ ALL_LDFLAGS += $(LDFLAGS) -L/usr/lib64 -m64
 
 else ifeq ($(config),debug_x86)
 TARGETDIR = bin/Debug
-TARGET = $(TARGETDIR)/project-rpg
-OBJDIR = obj/x86/Debug/project-rpg
+TARGET = $(TARGETDIR)/test-raylib
+OBJDIR = obj/x86/Debug/test-raylib
 DEFINES += -DDEBUG -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33 -D_GLFW_X11
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m32 -Wshadow -g -std=c17
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m32 -Wshadow -g -std=c++17
@@ -64,8 +64,8 @@ ALL_LDFLAGS += $(LDFLAGS) -L/usr/lib32 -m32
 
 else ifeq ($(config),debug_arm64)
 TARGETDIR = bin/Debug
-TARGET = $(TARGETDIR)/project-rpg
-OBJDIR = obj/ARM64/Debug/project-rpg
+TARGET = $(TARGETDIR)/test-raylib
+OBJDIR = obj/ARM64/Debug/test-raylib
 DEFINES += -DDEBUG -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33 -D_GLFW_X11
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -Wshadow -g -std=c17
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -Wshadow -g -std=c++17
@@ -75,8 +75,8 @@ ALL_LDFLAGS += $(LDFLAGS)
 
 else ifeq ($(config),release_x64)
 TARGETDIR = bin/Release
-TARGET = $(TARGETDIR)/project-rpg
-OBJDIR = obj/x64/Release/project-rpg
+TARGET = $(TARGETDIR)/test-raylib
+OBJDIR = obj/x64/Release/test-raylib
 DEFINES += -DNDEBUG -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33 -D_GLFW_X11
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -Wshadow -O2 -std=c17
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m64 -Wshadow -O2 -std=c++17
@@ -86,8 +86,8 @@ ALL_LDFLAGS += $(LDFLAGS) -L/usr/lib64 -m64 -s
 
 else ifeq ($(config),release_x86)
 TARGETDIR = bin/Release
-TARGET = $(TARGETDIR)/project-rpg
-OBJDIR = obj/x86/Release/project-rpg
+TARGET = $(TARGETDIR)/test-raylib
+OBJDIR = obj/x86/Release/test-raylib
 DEFINES += -DNDEBUG -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33 -D_GLFW_X11
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m32 -Wshadow -O2 -std=c17
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -m32 -Wshadow -O2 -std=c++17
@@ -97,8 +97,8 @@ ALL_LDFLAGS += $(LDFLAGS) -L/usr/lib32 -m32 -s
 
 else ifeq ($(config),release_arm64)
 TARGETDIR = bin/Release
-TARGET = $(TARGETDIR)/project-rpg
-OBJDIR = obj/ARM64/Release/project-rpg
+TARGET = $(TARGETDIR)/test-raylib
+OBJDIR = obj/ARM64/Release/test-raylib
 DEFINES += -DNDEBUG -DPLATFORM_DESKTOP -DGRAPHICS_API_OPENGL_33 -D_GLFW_X11
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -Wshadow -O2 -std=c17
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -Wshadow -O2 -std=c++17
@@ -118,8 +118,22 @@ endif
 GENERATED :=
 OBJECTS :=
 
+GENERATED += $(OBJDIR)/ecs.o
+GENERATED += $(OBJDIR)/input_system.o
 GENERATED += $(OBJDIR)/main.o
+GENERATED += $(OBJDIR)/menu_scene.o
+GENERATED += $(OBJDIR)/movement_system.o
+GENERATED += $(OBJDIR)/play_scene.o
+GENERATED += $(OBJDIR)/render_system.o
+GENERATED += $(OBJDIR)/scene_manager.o
+OBJECTS += $(OBJDIR)/ecs.o
+OBJECTS += $(OBJDIR)/input_system.o
 OBJECTS += $(OBJDIR)/main.o
+OBJECTS += $(OBJDIR)/menu_scene.o
+OBJECTS += $(OBJDIR)/movement_system.o
+OBJECTS += $(OBJDIR)/play_scene.o
+OBJECTS += $(OBJDIR)/render_system.o
+OBJECTS += $(OBJDIR)/scene_manager.o
 
 # Rules
 # #############################################
@@ -129,7 +143,7 @@ all: $(TARGET)
 
 $(TARGET): $(GENERATED) $(OBJECTS) $(LDDEPS) | $(TARGETDIR)
 	$(PRELINKCMDS)
-	@echo Linking project-rpg
+	@echo Linking test-raylib
 	$(SILENT) $(LINKCMD)
 	$(POSTBUILDCMDS)
 
@@ -150,7 +164,7 @@ else
 endif
 
 clean:
-	@echo Cleaning project-rpg
+	@echo Cleaning test-raylib
 ifeq (posix,$(SHELLTYPE))
 	$(SILENT) rm -f  $(TARGET)
 	$(SILENT) rm -rf $(GENERATED)
@@ -183,7 +197,28 @@ endif
 # File Rules
 # #############################################
 
+$(OBJDIR)/scene_manager.o: src/core/scene_manager.c
+	@echo "$(notdir $<)"
+	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/ecs.o: src/ecs/ecs.c
+	@echo "$(notdir $<)"
+	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/main.o: src/main.c
+	@echo "$(notdir $<)"
+	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/render_system.o: src/render_system.c
+	@echo "$(notdir $<)"
+	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/menu_scene.o: src/scenes/menu_scene.c
+	@echo "$(notdir $<)"
+	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/play_scene.o: src/scenes/play_scene.c
+	@echo "$(notdir $<)"
+	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/input_system.o: src/systems/input_system.c
+	@echo "$(notdir $<)"
+	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/movement_system.o: src/systems/movement_system.c
 	@echo "$(notdir $<)"
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 
